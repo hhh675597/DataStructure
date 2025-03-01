@@ -86,9 +86,24 @@ public:
     template <typename VST> void traverse (VST&); //遍历，使用函数对象，可全局性修改
 }; //Vector
 
+template <typename T> void Vector<T>::copyFrom(T const* A, Rank lo, Rank hi)
+{
+    _elem = new T[_capacity = 2 * (hi - lo)]; //分配空间， 规模清零
+    _size = 0;
+    while (lo < hi) {
+        _elem[_size] = A[lo];
+        _size++;
+        lo++;
+    } //以数组区间A[lo, hi)为蓝本复制向量
+} //基于复制的向量构造方法
 
-
-
+template <typename T> Vector<T>& Vector<T>::operator= (Vector<T> const& V)
+{
+    if (_elem) 
+        delete[] _elem; //释放原有内容
+    copyFrom(V._elem, 0, V.size()); //整体复制,size()为一个只读访问接口
+    return *this; 
+}
 
 
 
