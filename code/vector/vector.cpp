@@ -164,7 +164,7 @@ template <typename T> Rank Vector<T>::insert(Rank r, T const& e)
     return r;
 } //向量元素插入接口insert()
 
-template <typename T> int Vector<T>::remove(Rank lo, Rank hi)
+template <typename T> int Vector<T>::remove(Rank lo, Rank hi) //必须满足0 << lo << hi <<_size
 {
     if (lo == hi) return 0;
     while (hi < _size) 
@@ -180,6 +180,63 @@ template <typename T> T Vector<T>::remove(Rank r)
     remove(r, r+1); //调用上面的区间删除算法
     return e;
 } //利用区间删除实现单个元素删除
+
+template <typename T> int Vector<T>::deduplicate()
+{
+    int oldSize = _size; //记录原始规模
+    Rank i =1; //从第二个元素开始
+    while (i < _size)
+        (find(_elem[i], 0, i) < 0) ? i++ : remove(i); //invariable: 在当前元素的前缀_elem[0,i)内，所有元素彼此互异
+    return oldSize - _size; //被删除元素总数
+} //无序向量删重
+
+template <typename T>  void Vector<T>::traverse(void (*visit) (T&)) //函数指针
+{
+    for (int i = 0; i < _size; i++)
+        visit(_elem[i]); //函数指针
+}
+
+template <typename T> template <typename VST> //元素类型，操作器
+void Vector<T>::traverse(VST& visit) //函数对象
+{
+    for (int i = 0; i < _size; i++)
+        visit(_elem[i]);
+}
+
+/*eg
+template <typename T> struct Increase //函数对象：递增一个T类对象
+{
+    virtual void operator() (T& e) {e++;} //假设T可直接递增或已重载++
+};
+
+template <typename T> void increase(Vector<T>& V)
+{
+    V.traverse(Increase<T>()); //以Increase<T>()为基本操作进行遍历
+} //统一递增向量中的各元素
+*/
+
+//有序向量:前提条件为，各元素之间必须能够比较大小（<,<=等操作符已重载）
+template <typename T> int Vector<T>::disordered() const
+{
+    int cnt = 0; //计数器
+    for (int i = 1; i < _size; i++) //检查(_size - 1)对 相邻元素
+        if (_elem[i - 1] > _elem[i]) 
+            cnt++;
+    return cnt; //返回向量中逆序相邻元素对数，向量有序当且仅当n = 0.
+} //有序向量鉴别接口disordered()
+
+template <typename T> int Vector<T>::uniquify()
+{
+    Rank i = 0, j = 0;
+    while (++j < _size) { //逐一扫描直到末元素
+        if (_elem[i] != _elem[j]) //跳过雷同者
+            _elem[++i] = _elem[j]; //将不同的元素直接移到前者右侧，同时开始看下一个
+    }
+    _size = ++i;
+    shrink();
+    return j - i; //返回被删除元素总数
+} //高效版，利用“有序向量中相等元素必然前后相邻”，批量删除重复元素.
+
 int main(int, char** )
 {
 
