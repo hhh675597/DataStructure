@@ -105,10 +105,81 @@ template <typename T> Vector<T>& Vector<T>::operator= (Vector<T> const& V)
     return *this; 
 }
 
+template <typename T> void Vector<T>::expand()
+{
+    if (_size < _capacity) return; //尚未满员，不需要扩容
+    if (_capacity < DEFAULT_CAPACITY) _capacity = DEFAULT_CAPACITY; //不低于最小容量
+    T* oldElem = _elem;
+    _elem = new T[_capacity <<= 1]; //申请一个容量更大的数组
+    for (int i = 0; i < _size; i++) 
+        _elem[i] = oldElem[i]; //T为基本类型，或为已重载运算符"="
+    delete[] oldElem; //释放原有空间
+} //可扩容数组.注意每次在调用insert()接口之前都需要调用expand算法检查内部数组的可用容量
 
+template <typename T> void Vector<T>::shrink()
+{
+    if (_capacity < DEFAULT_CAPACITY << 1) return;
+    if (_size << 2 > _capacity) return; //装填因子小于0.25时考虑缩容，通常选用更低的阈值
+    T* oldElem = _elem;
+    _elem = new T[_capacity >>= 1];
+    for (int i = 0; i < _size; i++)
+        _elem[i] = oldElem[i];
+    delete[] oldElem;
+} //underflow并非必须解决的问题
 
+template <typename T> T& Vector<T>::operator[](Rank r) const
+{   return _elem[r];} //重载向量操作符[],与数组类似地直接通过下标访问元素
 
+template <typename T> void permute(Vector<T>& V)
+{
+    for (int i = V.size(); i > 0; i--)
+        swap(V[i - 1], V[rand() % i]);
+} //用重载后的[]实现置乱算法
 
+template <typename T> void Vector<T>::unsort(Rank lo, Rank hi)
+{
+    T* V = _elem + lo; //将待置乱的子向量[lo, hi)视作另一向量[0, hi - lo)
+    for (Rank i = hi - lo; i > 0; i--)
+        swap(V[i - 1], V[rand() % i]);
+} //与上类似，对外提供的向量置乱接口unsort()，以便测试/比较各种向量算法
+
+template <typename T> static bool lt(T& a, T& b) { return a < b; } //less than
+template <typename T> static bool lt(T* a, T* b) { return lt(*a, *b); } //less than指针版，按照被指对象的大小进行判断.对指针的数值即(被指对象的物理地址)的比较没有意义
+template <typename T> static bool eq(T& a, T& b) { return a == b; } //equal
+template <typename T> static bool eq(T* a, T* b) { return eq(*a, *b); } //equal指针版
+
+template <typename T> Rank Vector<T>::find(T const& e, Rank lo, Rank hi) const
+{
+    while ((lo < hi--) && (e != _elem[hi])); //从后向前，规定若有多个命中元素时返回其中秩最大者
+    return hi; //若hi < lo, 则失败，约定返回lo - 1;
+} //无序向量查找接口find()
+
+template <typename T> Rank Vector<T>::insert(Rank r, T const& e)
+{
+    expand(); //先检查是否需要扩容
+    for (int i = _size; i > r; i--)
+        _elem[i] = _elem[i - 1]; //自后向前，后继元素后移一个单元
+    _elem[r] = e;
+    _size += 1;
+    return r;
+} //向量元素插入接口insert()
+
+template <typename T> int Vector<T>::remove(Rank lo, Rank hi)
+{
+    if (lo == hi) return 0;
+    while (hi < _size) 
+        _elem[lo++] = _elem[hi++]; //[hi, size)中的元素顺次迁移hi - lo个单位
+    _size = lo; //终止时,lo = lo + _size -hi
+    shrink(); //若必要则缩容
+    return hi - lo; //返回被删除元素的数目    
+} //删除区间[lo, hi)
+
+template <typename T> T Vector<T>::remove(Rank r)
+{
+    T e = _elem[r];
+    remove(r, r+1); //调用上面的区间删除算法
+    return e;
+} //利用区间删除实现单个元素删除
 int main(int, char** )
 {
 
