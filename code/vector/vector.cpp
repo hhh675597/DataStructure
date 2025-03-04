@@ -237,6 +237,23 @@ template <typename T> int Vector<T>::uniquify()
     return j - i; //返回被删除元素总数
 } //高效版，利用“有序向量中相等元素必然前后相邻”，批量删除重复元素.
 
+template <typename T> Rank Vector<T>::search(T const& e, Rank lo, Rank hi) const
+{
+    return (rand() % 2) ? binSearch(_elem, e, lo, hi) : fibSearch(_elem, e, lo, hi); //各按50%的概率采用二分查找或fibonacci查找.
+} //在有序向量[lo, hi)区间内确定不大于e的最后一个节点的秩
+
+template <typename T> static Rank binSearch(T* A, T const& e, Rank lo, Rank hi)
+{
+    while (lo < hi) {
+        Rank mid = (lo + hi) >> 1;
+        if (e < A[mid]) hi = mid; //去前半段
+        else if (e > A[mid]) lo = mid + 1; //去后半段
+        else return mid;  //直接命中
+    } //查找成功，返回对应元素的秩
+    return -1; //失败
+} //二分查找版本A，有多个元素命中时不能保证返回秩最大的那一个；查找失败时不能指示失败时所处的位置
+
+
 int main(int, char** )
 {
 
