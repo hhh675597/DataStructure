@@ -15,6 +15,12 @@ void reverse(int* A, int lo, int hi)
     }
 } //多递归基递归版, O(hi - lo + 1)
 
+void reverse2(int*A, int lo, int hi)
+{
+    while (lo < hi)
+        swap(A[lo++], A[hi--]);
+} //由递归版等效转化而来的迭代版
+
 int main(int, char**)
 {
     int nums[] = {1, 3, 9, 7, 6};
@@ -22,5 +28,10 @@ int main(int, char**)
 
     for (int i = 0; i < 5; i++)
         printf("%d ", *(nums + i));
+    
+    reverse(nums, 5);
+    for (int i = 0; i < 5; i++)
+        printf("%d ", *(nums + i));
+
     return 0;
 }
