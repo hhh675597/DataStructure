@@ -1,4 +1,5 @@
 #include <iostream>
+#include "/home/hhh/DataStructure/code/recursion/fibonacci/fib.h"
 
 using namespace std;
 
@@ -253,6 +254,36 @@ template <typename T> static Rank binSearch(T* A, T const& e, Rank lo, Rank hi)
     return -1; //失败
 } //二分查找版本A，有多个元素命中时不能保证返回秩最大的那一个；查找失败时不能指示失败时所处的位置
 
+template <typename T> static Rank fibSearch(T* A, T const& e, Rank lo, Rank hi)
+{
+    Fib fib(hi - lo);
+    while (lo < hi) {
+        while (hi - lo < fib.get()) fib.prev(); //向前顺序查找
+        Rank mid = lo + fib.get() - 1; //以黄金分割点为取代中点作为切分点，加长比较次数少的前半段
+        if (e < A[mid]) hi = mid;
+        else if (e > A[mid]) lo = mid + 1;
+        else return mid;
+    }
+    return -1;
+} //斐波那契查找版本A，有多个元素命中时不能保证返回秩最大的那一个；查找失败时不能指示失败时所处的位置
+
+template <typename T> static Rank binSearchB(T* A, T const& e, Rank lo, Rank hi)
+{
+    while (1 < hi - lo) {
+        Rank mid = (lo + hi) >> 1;
+        (e < A[mid]) ? hi = mid : lo = mid; //仅作一次元素比较
+    } //只有等到区间内仅含一个元素即hi = lo + 1时才会退出循环
+    return (e == A[mid]) ? lo : -1;
+} //二分查找版本B, 不能保证返回秩最大者；失败时仅返回-1, 不能指示失败的位置
+
+template <typename T> static Rank RankSearchC(T* A, T const& e, Rank lo, Rank hi)
+{
+    while (hi - lo) { //当有效区间宽度缩为0(而非1)时才退出查找.
+        Rank mid = (lo + hi) >> 1;
+        (e < A[mid]) ? hi = mid : lo = mid + 1; //注意此处的 + 1
+    } //思考：循环不变量：A[0, lo)中的元素皆不大于e, A[hi, n)中的元素皆大于e
+    return --lo;
+} //二分查找版本C，多个元素命中时返回秩最大的者，查找失败时返回失败位置.
 
 int main(int, char** )
 {
