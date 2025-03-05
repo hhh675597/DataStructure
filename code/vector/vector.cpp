@@ -19,7 +19,7 @@ protected:
     void bubbleSort(Rank lo, Rank hi);//冒泡排序
     Rank max(Rank lo, Rank hi); //选取最大元素
     void selectionSort(Rank lo, Rank hi); //选择排序
-    void merge(Rank lo, Rank hi); //归并操作
+    void merge(Rank lo, Rank mi, Rank hi); //归并操作
     void mergeSort(Rank lo, Rank hi); //归并排序
     Rank partiton(Rank lo, Rank hi); //轴点构造算法？
     void quickSort(Rank lo, Rank hi); //快速排序算法
@@ -238,10 +238,6 @@ template <typename T> int Vector<T>::uniquify()
     return j - i; //返回被删除元素总数
 } //高效版，利用“有序向量中相等元素必然前后相邻”，批量删除重复元素.
 
-template <typename T> Rank Vector<T>::search(T const& e, Rank lo, Rank hi) const
-{
-    return (rand() % 2) ? binSearch(_elem, e, lo, hi) : fibSearch(_elem, e, lo, hi); //各按50%的概率采用二分查找或fibonacci查找.
-} //在有序向量[lo, hi)区间内确定不大于e的最后一个节点的秩
 
 template <typename T> static Rank binSearch(T* A, T const& e, Rank lo, Rank hi)
 {
@@ -267,16 +263,21 @@ template <typename T> static Rank fibSearch(T* A, T const& e, Rank lo, Rank hi)
     return -1;
 } //斐波那契查找版本A，有多个元素命中时不能保证返回秩最大的那一个；查找失败时不能指示失败时所处的位置
 
+template <typename T> Rank Vector<T>::search(T const& e, Rank lo, Rank hi) const
+{
+    return (rand() % 2) ? binSearch(_elem, e, lo, hi) : fibSearch(_elem, e, lo, hi); //各按50%的概率采用二分查找或fibonacci查找.
+} //在有序向量[lo, hi)区间内确定不大于e的最后一个节点的秩
+
 template <typename T> static Rank binSearchB(T* A, T const& e, Rank lo, Rank hi)
 {
     while (1 < hi - lo) {
         Rank mid = (lo + hi) >> 1;
         (e < A[mid]) ? hi = mid : lo = mid; //仅作一次元素比较
     } //只有等到区间内仅含一个元素即hi = lo + 1时才会退出循环
-    return (e == A[mid]) ? lo : -1;
+    return (e == A[lo]) ? lo : -1;
 } //二分查找版本B, 不能保证返回秩最大者；失败时仅返回-1, 不能指示失败的位置
 
-template <typename T> static Rank RankSearchC(T* A, T const& e, Rank lo, Rank hi)
+template <typename T> static Rank binSearchC(T* A, T const& e, Rank lo, Rank hi)
 {
     while (hi - lo) { //当有效区间宽度缩为0(而非1)时才退出查找.
         Rank mid = (lo + hi) >> 1;
@@ -285,8 +286,88 @@ template <typename T> static Rank RankSearchC(T* A, T const& e, Rank lo, Rank hi
     return --lo;
 } //二分查找版本C，多个元素命中时返回秩最大的者，查找失败时返回失败位置.
 
+template <typename T> void Vector<T>::sort(Rank lo, Rank hi)
+{
+    switch (rand() % 3) {
+        case 1: bubbleSort(lo, hi); break;
+        case 2: selectionSort(lo, hi); break;
+        case 3: mergeSort(lo, hi); break;
+        //case 4: heapSort(lo, hi); break; //稍后介绍
+        //default: quickSort(lo, hi); break; //稍后介绍
+    }
+}
+
+template <typename T> bool Vector<T>::bubble(Rank lo, Rank hi)
+{
+    bool sorted = true;
+    while (++lo < hi) {
+        if(_elem[lo - 1] > _elem[lo]) { //若逆序，则
+            sorted = false; //意味着整体尚未有序，还需检查
+            swap(_elem[lo - 1], _elem[lo]);
+        }
+    }
+    return sorted;
+} //一趟扫描交换
+
+template <typename T> void Vector<T>::bubbleSort(Rank lo, Rank hi)
+{
+    while (!bubble(lo, hi--));
+} //冒泡排序，k趟扫描后最大的k个元素必然就位
+
+template <typename T> Rank Vector<T>::max(Rank lo, Rank hi)
+{
+    Rank maxn = hi;
+    while (lo < hi--) //从后向前扫描
+        if (_elem[maxn] < _elem[hi]) //严格比较
+            maxn = hi;
+    return maxn;
+} //找出[lo, hi]区间中的最大元素对应的秩，且保持相对顺序，保证selectionSort的稳定性
+
+template <typename T> void Vector<T>::selectionSort(Rank lo, Rank hi)
+{
+    while (lo < hi--) 
+        swap(_elem[max(lo, hi)], _elem[hi]);
+} //选择排序，每次将剩下元素中最大的一个放在末尾已排序向量的前面
+
+template <typename T> void Vector<T>::merge(Rank lo, Rank mi, Rank hi)
+{
+    T* A = _elem + lo; //合并后的向量A[0, hi - lo) = _elem[lo, hi)
+    int length_left = mi - lo;
+    T* left = new T[length_left]; //左子向量left[0, length_left) = _elem[lo, mi)
+    for (int i = 0; i < length_left; i++)
+        left[i] = A[i]; //复制前子向量
+    int length_right = hi - mi;
+    T* right = _elem + mi;
+    for (Rank i = 0, j = 0, k = 0; (j < length_left) || (k < length_right); ) {
+        if ((j < length_left) && ( !(k < length_right) || (left[j] <= right[k]))) A[i++] = left[j++];
+        if ((k < length_right) && ( !(j < length_left) || (left[j] > right[k]))) A[i++] = right[k++];
+    }
+    delete[] left;
+} //2-way merge
+
+template <typename T> void Vector<T>::mergeSort(Rank lo, Rank hi)
+{
+    if (hi - lo < 2) return;
+    int mid = (lo + hi) >> 1;
+    mergeSort(lo, mid);
+    mergeSort(mid, hi);
+    merge(lo, mid, hi);
+} //向量归并排序
+
 int main(int, char** )
 {
+    int nums[] = {1, 10, 4, 4, 6, 9, 23, 5, 999};
+    Vector vec(nums, 9);
 
+    printf("23 is located at %d .\n", vec.find(23));
+
+    vec.sort(0, 8);
+    for (int i = 0; i < vec.size(); i++)
+        printf("%d\n", vec[i]);
+    
+    vec.insert(2);
+    printf("The new element 2 is located at %d .\n", vec.find(2));
+
+    printf("I guess the search algo cannot detect where 2 is :%d .\nyabali", vec.search(2, 0, 9));
     return 0;
 }
