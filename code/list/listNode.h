@@ -1,11 +1,12 @@
+#include <iostream>
 
 typedef int Rank;
-#define ListNodePosi(T) Listnode<T>* //列表节点的地址(position)
+#define ListNodePosi(T) ListNode<T>* //列表节点的地址(position)
 
 template <typename T> struct ListNode {
 //成员
     T data; //数值
-    ListNodePosi(T) pred, succ; //前驱，后继
+    ListNodePosi(T) pred; ListNodePosi(T) succ; //前驱，后继
 //构造函数
     ListNode() {} //对于首尾header,tailer的构造
     ListNode(T e, ListNodePosi(T) p = NULL, ListNodePosi(T) s = NULL)
