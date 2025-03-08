@@ -2,6 +2,18 @@
     "github.copilot.editor.enableAutoCompletions": false,
     "files.associations": {
       "iostream": "cpp",
-      "vector": "cpp"
+      "vector": "cpp",
+      "array": "cpp",
+      "*.tcc": "cpp",
+      "string": "cpp",
+      "unordered_map": "cpp",
+      "memory": "cpp",
+      "optional": "cpp",
+      "string_view": "cpp",
+      "istream": "cpp",
+      "ostream": "cpp",
+      "streambuf": "cpp",
+      "functional": "cpp",
+      "tuple": "cpp"
     }
   }
