@@ -226,16 +226,17 @@ template <typename T> void List<T>::selectionSort(ListNodePosi(T) p, int n) {
     ListNodePosi(T) tail = p;
     for (int i = 0; i < n; i++)
         tail = tail->succ;
-    while (1 < n--) {
+    while (1 < n) {
         ListNodePosi(T) maxn = selectMax(head->succ, n);
         insertB(tail, remove(maxn));
         tail = tail->pred;
+        n--;
     }
 } //选择排序
 template <typename T> ListNodePosi(T) List<T>::selectMax(ListNodePosi(T) p, int n) {
     ListNodePosi(T) maxn = p;
     ListNodePosi(T) cur = p;
-    while (0 < n--) {
+    for (ListNodePosi(T) cur = p; 1 < n; n--) {
         if ((cur = cur->succ)->data >= maxn->data)
             maxn = cur;
     }

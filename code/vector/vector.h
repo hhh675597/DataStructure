@@ -37,7 +37,7 @@ public:
         copyFrom(A, lo, hi); 
     }//区间复制
     Vector(Vector<T> const& V) {
-        copyFrom(V._elem, V._size); 
+        copyFrom(V._elem, 0, V._size); 
     }//向量整体复制
     Vector(Vector<T> const& V, Rank lo, Rank hi) {
         copyFrom(V._elem, lo, hi); 
