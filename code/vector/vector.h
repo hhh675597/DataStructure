@@ -1,3 +1,4 @@
+//ln90 template <typename T> void Vector<T>::copyFrom(T const* A, Rank lo, Rank hi)有bug!!!
 #include <iostream>
 #include "/home/hhh/DataStructure/code/recursion/fibonacci/fib.h"
 using namespace std;
@@ -89,6 +90,11 @@ public:
 template <typename T> void Vector<T>::copyFrom(T const* A, Rank lo, Rank hi)
 {
     _elem = new T[_capacity = 2 * (hi - lo)]; //分配空间， 规模清零
+/*!!!there may be a bug here!!!
+    terminate called after throwing an instance of 'std::bad_array_new_length'
+    what():  std::bad_array_new_length
+    编译器显示lo = 0, hi = -1. 
+*/
     _size = 0;
     while (lo < hi) {
         _elem[_size] = A[lo];
