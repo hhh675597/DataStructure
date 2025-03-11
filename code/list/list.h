@@ -120,7 +120,7 @@ template <typename T> ListNodePosi(T) ListNode<T>::insertAsPred(T const& e) {
     return x;
 }
 template <typename T> ListNodePosi(T) ListNode<T>::insertAsSucc(T const& e) {
-    ListNodePosi(T) x = new ListNode(e, this, succ); //请回到.h看ListNode的初始化方式，已经规定x->pred = pred, x->succ = this
+    ListNodePosi(T) x = new ListNode(e, this, succ); //请回到.h看ListNode的初始化方式，已经规定x->pred = this, x->succ = succ
     succ->pred = x;
     succ = x;
     return x;
