@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <cstdlib>
 #define BinNodePosi(T) BinNode<T>* //二叉树节点的地址
 #define stature(p) ((p) ? (p->height) : -1) //stature也是高度的意思,这里是为了与"规定空树高度为-1"相统一
 
@@ -34,6 +36,7 @@ template <typename T> struct BinNode {
         return data == bn.data;
     }
 }; //二叉树节点 类模板
+
 //基于BinNode的一些操作
 /***************************** 
  * BinNode性质与状态的判断
@@ -66,7 +69,7 @@ template <typename T> BinNodePosi(T) BinNode<T>::insertAsRC(T const& e) {
 //定位直接后继，succ()接口的实现将在介绍完pre/in/postfix后给出
 
 template <typename T> template <typename VST> void BinNode<T>::travIn(VST& visit) { //元素类型，操作器
-    switch(rand() % 5) { //暂随机选择1/5
+    switch (rand() % 5) { //暂随机选择1/5
         case 1: travIn_I1(this, visit); break; //迭代版#1
         case 2: travIn_I2(this, visit); break; //迭代版#2
         case 3: travIn_I3(this, visit); break; //迭代版#3
