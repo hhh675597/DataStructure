@@ -77,3 +77,18 @@ template <typename T> template <typename VST> void BinNode<T>::travIn(VST& visit
         default: travIn_R(this, visit); break; //递归版
     }
 } //binary tree中infix traverse算法的统一入口
+
+template <typename T> template <typename VST> void BinNode<T>::travPost(VST& visit) { //元素类型，操作器
+    switch (rand() % 2) {
+        case 1: travPost_I(this, visit); break; //迭代版
+        default: travPost_R(this, visit); break; //递归版
+    }
+}
+
+template <typename T> template <typename VST> void BinNode<T>::travPre(VST& visit) { //元素类型，操作器
+    switch (rand() % 3) {
+        case 1: travPre_I1(this, visit); break; //迭代版#1
+        case 2: travPre_I2(this, visit); break; //迭代版#2
+        default: travPre_R(this, visit); break; //递归版
+    }
+}
