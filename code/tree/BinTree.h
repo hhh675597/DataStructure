@@ -289,7 +289,7 @@ template <typename T> static void gotoHLVFL(stack<BinNodePosi(T)>& stk) {
             stk.push(x->lc);
         } else stk.push(x->rc);
     }
-    stk.pop();
+    stk.pop(); //最后一次操作会使得栈顶是NULL,需要pop出去
 } //find Heighest Leaf Visible From Left(后序遍历开始的节点)
 
 template <typename T, typename VST> void travPost_I(BinNodePosi(T) x, VST& visit) {
