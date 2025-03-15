@@ -283,10 +283,10 @@ template <typename T, typename VST> void travIn_I4(BinNodePosi(T) x, VST& visit)
 
 template <typename T> static void gotoHLVFL(stack<BinNodePosi(T)>& stk) {
     while (BinNodePosi(T) x = stk.top()) {
-        if (HasLChild(*x)) {
-            if (HasRChild(*x))
-                stk.push(x->rc);
-            stk.push(x->lc);
+        if (HasLChild(*x)) { //尽可能向左
+            if (HasRChild(*x)) //若有右孩子
+                stk.push(x->rc); //优先入栈
+            stk.push(x->lc); //然后左孩子入栈
         } else stk.push(x->rc);
     }
     stk.pop(); //最后一次操作会使得栈顶是NULL,需要pop出去
