@@ -2,7 +2,7 @@
 #define GRAPHMATRIX_H
 
 #include "graph.h"
-#include <vector>
+#include <vector> //此处选择使用cpp标准stl库，没有用前面手打的vector.h，客观上造成很大麻烦
 
 template <typename Tv> struct Vertex {
     Tv data; int inDegree, outDegree; VStatus status; //数据，入度， 出度， 状态
@@ -22,15 +22,15 @@ template <typename Te> struct Edge {
 template <typename Tv, typename Te>
 class GraphMatrix : public Graph<Tv, Te> { //class graph的派生类graphmatrix,基于邻接矩阵生成的图
 private:
-    std::vector<Vertex<Tv>> V; //顶点集,向量
-    std::vector<std::vector<Edge<Te>*>> E; 
+    vector<Vertex<Tv>> V; //顶点集,向量
+    vector<vector<Edge<Te>*>> E; 
 public:
     GraphMatrix() {
-        Graph<Tv, Te>::n = Graph<Tv, Te>::e = 0;
+        n = e = 0;
     } //构造
     ~GraphMatrix() {
-        for (int i = 0; i < Graph<Tv, Te>::n; i++)
-            for (int j = 0; j < Graph<Tv, Te>::n; j++)
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
                 delete E[i][j];
     } //析构
 //顶点的基本操作：查询第i个顶点(0 <= i < n)
@@ -44,7 +44,7 @@ public:
         return V[i].outDegree;
     } //入度
     virtual int firstNbr(int i) {
-        return nextNbr(i, Graph<Tv, Te>::n);
+        return nextNbr(i, n);
     } //首个邻接顶点
     virtual int nextNbr(int i, int j) {
         while (-1 < j && !exists(i, --j)); //逆向线性试探
@@ -67,11 +67,25 @@ public:
     } //遍历树里的优先级
 //顶点的动态操作
     virtual int insert(Tv const& vertex) {
-        for (int j = 0; j < Graph<Tv, Te>::n; j++) {
-            E[j].push_back(NULL); //在向量末尾添加元素
+        for (int j = 0; j < n; j++) {
+            E[j].push_back(NULL); //各顶点预留一条潜在的关联边
             n++;
         }
+        E.push_back(vector<Edge<Te>*> (n, n, (Edge<Te>*) NULL)); //创建新顶点对应的边向量
+        //return V.insert(vertex<Tv> (vertex)); 该行是对着书抄的，有bug.
     } //插入顶点，返回编号
-    //test
+    virtual Tv remove(int i) {
+        for (int j = 0; j < n; j++) {
+            if (exists(i, j)) { //若存在
+                delete E[i][j];
+                V[j].indegree--; //逐条删除
+            } //考虑点i的所有出边
+        }
+
+        E.erase(E.begin() + i);
+        n--;
+
+    } //删除第i个顶点及其关联边
+
 };
 #endif
