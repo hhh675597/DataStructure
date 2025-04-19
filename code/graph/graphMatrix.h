@@ -2,7 +2,7 @@
 #define GRAPHMATRIX_H
 
 #include "graph.h"
-#include <vector>
+#include <vector> //此处选择使用cpp标准stl库，没有用前面手打的vector.h，客观上造成很大麻烦
 
 template <typename Tv> struct Vertex {
     Tv data; int inDegree, outDegree; VStatus status; //数据，入度， 出度， 状态
@@ -72,7 +72,7 @@ public:
             n++;
         }
         E.push_back(vector<Edge<Te>*> (n, n, (Edge<Te>*) NULL)); //创建新顶点对应的边向量
-        
+        //return V.insert(vertex<Tv> (vertex)); 该行是对着书抄的，有bug.
     } //插入顶点，返回编号
     virtual Tv remove(int i) {
         for (int j = 0; j < n; j++) {
